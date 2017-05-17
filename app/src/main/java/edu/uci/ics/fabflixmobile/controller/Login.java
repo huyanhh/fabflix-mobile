@@ -91,32 +91,20 @@ public final class Login extends AppCompatActivity
         final String tempEmail = email;
         final String tempPassword = password;
 
-        // [START sign_in_with_email]
-//        mAuth.signInWithEmailAndPassword(email, password)
-//                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-//                        Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
-//
-//                        // If sign in fails, display a message to the user. If sign in succeeds
-//                        // the auth state listener will be notified and logic to handle the
-//                        // signed in user can be handled in the listener.
-//                        if (!task.isSuccessful()) {
-//                            AlertDialog.Builder Alert = new AlertDialog.Builder(Login.this);
-//                            Alert.setMessage("Incorrect Username or Password");
-//                            Alert.setPositiveButton("OK", null);
-//                            Alert.create().show();
-//                        } else {
-////                            create an intent to store Username information for UserActivity
-//                            Intent userIntent = new Intent(Login.this, Search.class);
-//                            userIntent.putExtra("Username", tempEmail);
-//                            userIntent.putExtra("password", tempPassword);
-//                            Username = tempEmail;
-//                            Password = tempPassword;
-//                            startActivity(userIntent);
-//                        }
-//                    }
-//                });
+        if (false) {
+            AlertDialog.Builder Alert = new AlertDialog.Builder(Login.this);
+            Alert.setMessage("Incorrect Username or Password");
+            Alert.setPositiveButton("OK", null);
+            Alert.create().show();
+        } else {
+//          create an intent to store Username information for UserActivity
+            Intent userIntent = new Intent(Login.this, Search.class);
+            userIntent.putExtra("Username", tempEmail);
+            userIntent.putExtra("password", tempPassword);
+            Username = tempEmail;
+            Password = tempPassword;
+            startActivity(userIntent);
+        }
     }
 
 

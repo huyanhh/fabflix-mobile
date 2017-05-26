@@ -1,5 +1,6 @@
 package edu.uci.ics.fabflixmobile.controller;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,11 +10,24 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.uci.ics.fabflixmobile.R;
 
@@ -24,7 +38,9 @@ public final class Login extends AppCompatActivity
     private static SharedPreferences.Editor pe;
     private static String Username;
     private static String Password;
-    String mChildCode;
+    private int mStatusCode = 0;
+
+    Button bLogin;
 
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -38,26 +54,10 @@ public final class Login extends AppCompatActivity
         final EditText etUsername = (EditText) findViewById(R.id.etUsername);
         final EditText etPassword = (EditText) findViewById(R.id.etPassword);
 
-        final Button bLogin = (Button) findViewById(R.id.bLogin);
+        bLogin = (Button) findViewById(R.id.bLogin);
 
         String spUsername = ps.getString("Username","");
         String spPassword = ps.getString("password", "");
-
-        //auto-login
-//        if (spUsername.length() != 0 || spPassword.length() != 0)
-//        {
-//            etUsername.setText(spUsername);
-//            etPassword.setText(spPassword);
-//            //create an intent to store Username information for UserActivity
-//            Intent userIntent = new Intent(LoginActivity.this, HomeParentActivity.class);
-//            userIntent.putExtra("Username", spUsername);
-//            Username = spUsername;
-//            userIntent.putExtra("password", spPassword);
-//            Password = spPassword;
-//            //start activity to UserActivity.class
-//            LoginActivity.this.startActivity(userIntent);
-//        }
-
 
         //LoginActivity process
         if (bLogin != null) {
@@ -70,7 +70,7 @@ public final class Login extends AppCompatActivity
                     final String username = etUsername.getText().toString(); // should be email
                     final String password = etPassword.getText().toString();
                     if(!username.isEmpty() || !password.isEmpty()) {
-                        signIn(username, password);
+                        login(username, password);
                     }
                     //if username||password is empty display this
                     else
@@ -86,27 +86,62 @@ public final class Login extends AppCompatActivity
         }
     }
 
-    private void signIn(String email, final String password) {
-        Log.d(TAG, "signIn:" + email);
+
+    public void login(final String email, final String password){
+
         final String tempEmail = email;
         final String tempPassword = password;
 
-        if (false) {
-            AlertDialog.Builder Alert = new AlertDialog.Builder(Login.this);
-            Alert.setMessage("Incorrect Username or Password");
-            Alert.setPositiveButton("OK", null);
-            Alert.create().show();
-        } else {
-//          create an intent to store Username information for UserActivity
-            Intent userIntent = new Intent(Login.this, Search.class);
-            userIntent.putExtra("Username", tempEmail);
-            userIntent.putExtra("password", tempPassword);
-            Username = tempEmail;
-            Password = tempPassword;
-            startActivity(userIntent);
-        }
-    }
+        // no user is logged in, so we must connect to the server
+        RequestQueue queue = Volley.newRequestQueue(this);
 
+        final Context context = this;
+//        String url = "http://54.183.252.246:8080/servlet/Login";
+        String url = "http://192.168.1.157:8080/servlet/Login";
+
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("response", response);
+
+                        if (response.contains("success")) {
+                            Intent userIntent = new Intent(Login.this, Search.class);
+                            userIntent.putExtra("Username", tempEmail);
+                            userIntent.putExtra("password", tempPassword);
+                            Username = tempEmail;
+                            Password = tempPassword;
+                            startActivity(userIntent);
+                        }
+                        else {
+                            AlertDialog.Builder Alert = new AlertDialog.Builder(Login.this);
+                            Alert.setMessage("Incorrect Username or Password");
+                            Alert.setPositiveButton("OK", null);
+                            Alert.create().show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        Log.d("security.error", error.toString());
+                    }
+                }) {
+                    @Override
+                    protected Map<String, String> getParams() {
+                        final Map<String, String> params = new HashMap<>();
+                        params.put("email", email);
+                        params.put("password", password);
+                        Log.d("params", params.get("email"));
+                        Log.d("params", params.get("password"));
+                        return params;
+                    }
+        };
+
+        // Add the request to the RequestQueue.
+        queue.add(postRequest);
+    }
 
     public static void clearUsername()
     {

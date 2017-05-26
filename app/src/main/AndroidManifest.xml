@@ -22,6 +22,9 @@
             android:name=".controller.Search"
             android:label="@string/title_search" />
         <activity
+            android:name=".controller.Titles"
+            android:label="@string/titles" />
+        <activity
             android:name=".BlueActivity"
             android:label="@string/title_activity_blue" />
         <activity

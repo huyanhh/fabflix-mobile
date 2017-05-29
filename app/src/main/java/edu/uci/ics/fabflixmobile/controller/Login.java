@@ -96,8 +96,7 @@ public final class Login extends AppCompatActivity
         RequestQueue queue = Volley.newRequestQueue(this);
 
         final Context context = this;
-//        String url = "http://54.183.252.246:8080/servlet/Login";
-        String url = "http://192.168.1.157:8080/servlet/Login";
+        String url = "http://13.58.77.131:8080/servlet/Login";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>()
@@ -126,6 +125,10 @@ public final class Login extends AppCompatActivity
                     public void onErrorResponse(VolleyError error) {
                         // error
                         Log.d("security.error", error.toString());
+                        AlertDialog.Builder Alert = new AlertDialog.Builder(Login.this);
+                        Alert.setMessage("Incorrect Username or Password");
+                        Alert.setPositiveButton("OK", null);
+                        Alert.create().show();
                     }
                 }) {
                     @Override

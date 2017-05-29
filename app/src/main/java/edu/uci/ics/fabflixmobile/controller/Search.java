@@ -93,7 +93,7 @@ public final class Search extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
 
         final Context context = this;
-        String url = "http://192.168.1.157:8080/servlet/AjaxSearch?movieTitle=" + text;
+        String url = "http://13.58.77.131:8080/servlet/AjaxSearch?movieTitle=" + text;
 
         StringRequest postRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>()
@@ -102,11 +102,16 @@ public final class Search extends AppCompatActivity {
                     public void onResponse(String response) {
                         Log.d("response", response);
                         String [] titles = getTitles(response);
-                        if (titles == null)
-                            return;
-                        Intent i = new Intent(Search.this, Titles.class);
-                        i.putExtra("titles", titles);
-                        startActivity(i);
+                        if (response.equals("")) {
+                            AlertDialog.Builder Alert = new AlertDialog.Builder(Search.this);
+                            Alert.setMessage("No Results found");
+                            Alert.setPositiveButton("OK", null);
+                            Alert.create().show();
+                        } else {
+                            Intent i = new Intent(Search.this, Titles.class);
+                            i.putExtra("titles", titles);
+                            startActivity(i);
+                        }
                     }
                 }, new Response.ErrorListener() {
             @Override
